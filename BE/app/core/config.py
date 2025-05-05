@@ -14,4 +14,7 @@ class Settings(BaseSettings):
     )
 
 
-settings = Settings()
+try:
+    settings = Settings()
+except Exception as e:
+    raise RuntimeError("Fail to load environment vars") from e
