@@ -8,9 +8,10 @@ class Settings(BaseSettings):
 
     GEMINI_API_KEY: str
     NOTION_API_KEY: str
+    PORT: int
 
     model_config = SettingsConfigDict(
-        case_sensitive=True, env_file="../.env", env_file_encoding="utf-8"
+        case_sensitive=True, env_file=".env", env_file_encoding="utf-8"
     )
 
 
