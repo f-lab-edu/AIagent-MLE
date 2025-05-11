@@ -172,3 +172,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# test notebook
+BE/test.ipynb
+# qdrant volume
+BE/qdrant_storage
