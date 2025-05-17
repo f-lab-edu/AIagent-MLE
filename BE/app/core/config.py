@@ -1,6 +1,7 @@
 """RAG 서버 설정 파일"""
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Literal
 
 
 class Settings(BaseSettings):
@@ -8,7 +9,11 @@ class Settings(BaseSettings):
 
     GEMINI_API_KEY: str
     NOTION_API_KEY: str
+
     QDRANT_SERVER: str
+    QDRANT_COLLECTION_NAME: str
+    VECTOR_SIZE: int
+    DISTANCE_METRIC: Literal["DOT", "COSINE", "EUCLID", "MANHATTAN"] = "COSINE"
 
     model_config = SettingsConfigDict(
         case_sensitive=True, env_file=".env", env_file_encoding="utf-8"
