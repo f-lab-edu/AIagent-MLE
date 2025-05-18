@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from exceptions.exception import ExceptionCase, CustomException
+from core.exception import ExceptionCase, CustomException
 
 
 def set_error_handlers(app: FastAPI):

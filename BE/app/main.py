@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from exceptions.handler import set_error_handlers
-from exceptions.exception import CustomException, ExceptionCase
+from core.handler import set_error_handlers
+from core.exception import CustomException, ExceptionCase
 
 app = FastAPI()
 
