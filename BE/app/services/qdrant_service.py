@@ -1,9 +1,10 @@
 from typing import List
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import Distance, PointStruct
+from qdrant_client import models
 from core.config import settings
 from core.exception import CustomException, ExceptionCase
-from schemas.qdrant_schemas import DocumentInput
+from schemas.qdrant_schemas import DocumentInput, DocumentOutput
 
 
 class QdrantService:
@@ -57,6 +58,38 @@ class QdrantService:
             await self.client.upsert(
                 collection_name=self.collection_name, points=points
             )
+
+        except Exception as e:
+            raise CustomException(
+                exception_case=ExceptionCase.UNEXPECTED_ERROR, detail=str(e)
+            )
+
+    async def query_document(
+        self, embedding: List[float], metadata: dict
+    ) -> List[DocumentOutput]:
+        """임베딩 벡터로 문서 검색"""
+        try:
+            query_result = await self.client.query_points(
+                collection_name=self.collection_name,
+                query=embedding,
+                query_filter=models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key=key, match=models.MatchValue(value=value)
+                        )
+                        for key, value in metadata.items()
+                    ]
+                ),
+            )
+            query_points = query_result.points
+            if not query_points:
+                return []
+
+            query_documents = [
+                DocumentOutput(id=point.id, score=point.score, metadata=point.payload)
+                for point in query_points
+            ]
+            return query_documents
 
         except Exception as e:
             raise CustomException(
