@@ -1,7 +1,9 @@
+from typing import List
 from qdrant_client import AsyncQdrantClient
-from qdrant_client.models import Distance
+from qdrant_client.models import Distance, PointStruct
 from core.config import settings
 from core.exception import CustomException, ExceptionCase
+from schemas.qdrant_schemas import DocumentInput
 
 
 class QdrantService:
@@ -28,13 +30,34 @@ class QdrantService:
         """시스템 시작 시 컬렉션 확인 및 생성"""
         try:
             if not await self.client.collection_exists(self.collection_name):
-                self.client.create_collection(
+                await self.client.create_collection(
                     collection_name=self.collection_name,
                     vectors_config={
                         "size": self.vector_size,
                         "distance": self.distance_metric,
                     },
                 )
+        except Exception as e:
+            raise CustomException(
+                exception_case=ExceptionCase.UNEXPECTED_ERROR, detail=str(e)
+            )
+
+    async def upsert_document(self, documents: List[DocumentInput]) -> None:
+        """문서 청크 업로드"""
+        try:
+            points = [
+                PointStruct(
+                    id=document.id,
+                    vector=document.embedding,
+                    metadata=document.metadata,
+                )
+                for document in documents
+            ]
+
+            await self.client.upsert(
+                collection_name=self.collection_name, points=points
+            )
+
         except Exception as e:
             raise CustomException(
                 exception_case=ExceptionCase.UNEXPECTED_ERROR, detail=str(e)
