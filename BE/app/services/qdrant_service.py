@@ -50,7 +50,7 @@ class QdrantService:
                 PointStruct(
                     id=document.id,
                     vector=document.embedding,
-                    metadata=document.metadata,
+                    payload=document.metadata,
                 )
                 for document in documents
             ]
