@@ -4,18 +4,32 @@ from fastapi import status
 
 
 class ExceptionCase(Enum):
-    INVALID_INPUT = (status.HTTP_400_BAD_REQUEST, "1100", "Invalid Input")
+    INVALID_INPUT = (status.HTTP_400_BAD_REQUEST, "1100")
 
+    VECTOR_DB_INIT_ERROR = (
+        status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "8001",
+    )
+    VECTOR_DB_UPSERT_ERROR = (
+        status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "8002",
+    )
+    VECTOR_DB_QUERY_ERROR = (
+        status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "8002",
+    )
+    VECTOR_DB_DELETE_ERROR = (
+        status.HTTP_500_INTERNAL_SERVER_ERROR,
+        "8003",
+    )
     UNEXPECTED_ERROR = (
         status.HTTP_500_INTERNAL_SERVER_ERROR,
         "9001",
-        "Unexpected Error",
     )
 
-    def __init__(self, status_code: int, error_code: str, msg: str):
+    def __init__(self, status_code: int, error_code: str):
         self._status_code = status_code
         self._error_code = error_code
-        self._msg = msg
 
     @property
     def status_code(self):
@@ -27,7 +41,7 @@ class ExceptionCase(Enum):
 
     @property
     def msg(self):
-        return self._msg
+        return self.name
 
 
 class CustomException(HTTPException):

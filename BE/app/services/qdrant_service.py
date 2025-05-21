@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import Distance, PointStruct
 from qdrant_client import models
@@ -94,4 +94,29 @@ class QdrantService:
         except Exception as e:
             raise CustomException(
                 exception_case=ExceptionCase.UNEXPECTED_ERROR, detail=str(e)
+            )
+
+    async def delete_document(self, conditions: Union[List[str], dict]) -> None:
+        """Point ID로문서 삭제"""
+        try:
+            if isinstance(conditions, list):
+                await self.client.delete(
+                    collection_name=self.collection_name,
+                    points_selector=models.PointIdsList(points=conditions),
+                )
+            elif isinstance(conditions, dict):
+                await self.client.delete(
+                    collection_name=self.collection_name,
+                    points_selector=models.Filter(
+                        must=[
+                            models.FieldCondition(
+                                key=key, match=models.MatchValue(value=value)
+                            )
+                            for key, value in conditions.items()
+                        ]
+                    ),
+                )
+        except Exception as e:
+            raise CustomException(
+                exception_case=ExceptionCase.VECTOR_DB_DELETE_ERROR, detail=str(e)
             )
