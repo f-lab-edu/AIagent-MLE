@@ -40,7 +40,7 @@ class QdrantService:
                 )
         except Exception as e:
             raise CustomException(
-                exception_case=ExceptionCase.UNEXPECTED_ERROR, detail=str(e)
+                exception_case=ExceptionCase.VECTOR_DB_INIT_ERROR, detail=str(e)
             )
 
     async def upsert_document(self, documents: List[DocumentInput]) -> None:
@@ -61,7 +61,7 @@ class QdrantService:
 
         except Exception as e:
             raise CustomException(
-                exception_case=ExceptionCase.UNEXPECTED_ERROR, detail=str(e)
+                exception_case=ExceptionCase.VECTOR_DB_OP_ERROR, detail=str(e)
             )
 
     async def query_document(
@@ -93,7 +93,7 @@ class QdrantService:
 
         except Exception as e:
             raise CustomException(
-                exception_case=ExceptionCase.UNEXPECTED_ERROR, detail=str(e)
+                exception_case=ExceptionCase.VECTOR_DB_OP_ERROR, detail=str(e)
             )
 
     async def delete_document(self, conditions: Union[List[str], dict]) -> None:
@@ -118,5 +118,5 @@ class QdrantService:
                 )
         except Exception as e:
             raise CustomException(
-                exception_case=ExceptionCase.VECTOR_DB_DELETE_ERROR, detail=str(e)
+                exception_case=ExceptionCase.VECTOR_DB_OP_ERROR, detail=str(e)
             )
