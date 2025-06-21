@@ -1,6 +1,10 @@
+import logging
+from fastapi import status
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from core.exception import ExceptionCase, CustomException
+
+logger = logging.getLogger(__name__)
 
 
 def set_error_handlers(app: FastAPI):
@@ -10,8 +14,19 @@ def set_error_handlers(app: FastAPI):
         request: Request, exception: CustomException
     ) -> JSONResponse:
         """
-        클라이언트 요청에 따라 발생하는 400번대 응답.
+        사전에 정의된 에러
         """
+
+        if exception.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR:
+            # 500 server 에러일 경우: logger.exception
+            logger.exception(
+                f"Server error: {exception.code} - {exception.msg} - {exception.detail}"
+            )
+        else:
+            # 500 server 이외의 client 에러일 경우: logger.warning
+            logger.warning(
+                f"Client error: {exception.code} - {exception.msg} - {exception.detail}"
+            )
         return JSONResponse(
             status_code=exception.status_code,
             content={
@@ -26,8 +41,9 @@ def set_error_handlers(app: FastAPI):
         request: Request, exception: Exception
     ) -> JSONResponse:
         """
-        서버에서 발생한 500번대 응답.
+        서버에서 발생한 예측되지 않은 예외.
         """
+        logger.exception(f"Unexpected error: {exception}")
         return JSONResponse(
             status_code=ExceptionCase.UNEXPECTED_ERROR.status_code,
             content={
