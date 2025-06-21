@@ -10,18 +10,7 @@ class ExceptionCase(Enum):
         status.HTTP_500_INTERNAL_SERVER_ERROR,
         "8001",
     )
-    VECTOR_DB_UPSERT_ERROR = (
-        status.HTTP_500_INTERNAL_SERVER_ERROR,
-        "8002",
-    )
-    VECTOR_DB_QUERY_ERROR = (
-        status.HTTP_500_INTERNAL_SERVER_ERROR,
-        "8002",
-    )
-    VECTOR_DB_DELETE_ERROR = (
-        status.HTTP_500_INTERNAL_SERVER_ERROR,
-        "8003",
-    )
+    VECTOR_DB_OP_ERROR = (status.HTTP_500_INTERNAL_SERVER_ERROR, "8002")
     UNEXPECTED_ERROR = (
         status.HTTP_500_INTERNAL_SERVER_ERROR,
         "9001",
