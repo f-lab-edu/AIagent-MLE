@@ -4,6 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Literal, Optional
 
 
+
 class Settings(BaseSettings):
     """환경변수 설정"""
 
