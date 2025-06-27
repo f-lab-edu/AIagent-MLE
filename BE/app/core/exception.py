@@ -6,6 +6,8 @@ from fastapi import status
 class ExceptionCase(Enum):
     INVALID_INPUT = (status.HTTP_400_BAD_REQUEST, "1100")
 
+    GEMINI_ERROR = (status.HTTP_500_INTERNAL_SERVER_ERROR, "2001")
+
     VECTOR_DB_INIT_ERROR = (
         status.HTTP_500_INTERNAL_SERVER_ERROR,
         "8001",
