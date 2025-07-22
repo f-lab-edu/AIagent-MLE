@@ -175,5 +175,6 @@ cython_debug/
 
 # test notebook
 BE/app/test.ipynb
+BE/app/test.py
 # qdrant volume
 BE/qdrant_storage
