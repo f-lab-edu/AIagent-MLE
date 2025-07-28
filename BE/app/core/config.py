@@ -11,7 +11,7 @@ class Settings(BaseSettings):
 
     GEMINI_API_KEY: str
     NOTION_API_KEY: str
-    SMITHERY_API_KEY: str = "2a8e8fb9-a326-4f4d-adfa-62f9ae1febb8"
+    SMITHERY_API_KEY: str
 
     QDRANT_SERVER: Optional[str] = "http://localhost:6333"
     QDRANT_COLLECTION_NAME: Optional[str] = "test_collection"
