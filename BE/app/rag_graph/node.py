@@ -16,13 +16,13 @@ gemini = GeminiService()
 qdrant = QdrantService()
 
 
-async def node_refine_question(state: GraphState) -> GraphState:
+async def refine_question(state: GraphState) -> GraphState:
     """
     1. 이전 대화 내역을 바탕으로 쿼리를 재작성 해주는 노드.
     """
     try:
         print("-------------------------")
-        print(node_refine_question.__name__)
+        print(refine_question.__name__)
         print(state)
         gemini = GeminiService(model="gemini-2.0-flash-lite")
         messages = state["messages"]
@@ -36,17 +36,17 @@ async def node_refine_question(state: GraphState) -> GraphState:
     except Exception as e:
         raise CustomException(
             exception_case=ExceptionCase.GRAPH_NODE_ERROR,
-            detail=f"Error occured in node_refine_question: {e}",
+            detail=f"Error occured in refine_question: {e}",
         )
 
 
-async def node_decision_context_need(state: GraphState) -> GraphState:
+async def decide_context_necessity(state: GraphState) -> GraphState:
     """
     2. 쿼리를 보고 컨텍스트 검색이 필요한지 결정하는 노드.
     """
     try:
         print("-------------------------")
-        print(node_decision_context_need.__name__)
+        print(decide_context_necessity.__name__)
         print(state)
         gemini = GeminiService(model="gemini-2.0-flash-lite")
         question = state["question"]
@@ -63,28 +63,28 @@ async def node_decision_context_need(state: GraphState) -> GraphState:
     except Exception as e:
         raise CustomException(
             exception_case=ExceptionCase.GRAPH_NODE_ERROR,
-            detail=f"Error occured in node_decision_context_need: {e}",
+            detail=f"Error occured in decide_context_necessity: {e}",
         )
 
 
-def router_decision_context_need(state: GraphState) -> bool:
+def should_retrieve_context(state: GraphState) -> bool:
     """
     검색이 필요 여부에 따라 다음 노드를 결정하는 라우터.
     """
     print("-------------------------")
-    print(router_decision_context_need.__name__)
+    print(should_retrieve_context.__name__)
     print(state)
 
     return state["is_context_need"]
 
 
-async def node_retriever(state: GraphState) -> GraphState:
+async def retrieve_context(state: GraphState) -> GraphState:
     """
     3. 쿼리를 바탕으로 컨텍스트를 가져오는 노드.
     """
     try:
         print("-------------------------")
-        print(node_retriever.__name__)
+        print(retrieve_context.__name__)
         print(state)
         question = state["question"]
         authority_group = state["authority_group"]
@@ -110,18 +110,18 @@ async def node_retriever(state: GraphState) -> GraphState:
     except Exception as e:
         raise CustomException(
             exception_case=ExceptionCase.GRAPH_NODE_ERROR,
-            detail=f"Error occured in node_retriever: {e}",
+            detail=f"Error occured in retrieve_context: {e}",
         )
 
 
-async def node_check_context_latest(state: GraphState) -> GraphState:
+async def check_context_latest(state: GraphState) -> GraphState:
     """
     4. 컨텍스트의 최신성을 검증하는 노드.
     최신이 아닌 컨텍스트는 mcp를 호출해서 최신 정보로 업데이트.
     """
     try:
         print("-------------------------")
-        print(node_check_context_latest.__name__)
+        print(check_context_latest.__name__)
         print(state)
         latest_context = []
         old_context = []
@@ -155,17 +155,17 @@ async def node_check_context_latest(state: GraphState) -> GraphState:
     except Exception as e:
         raise CustomException(
             exception_case=ExceptionCase.GRAPH_NODE_ERROR,
-            detail=f"Error occured in node_check_context_latest: {e}",
+            detail=f"Error occured in check_context_latest: {e}",
         )
 
 
-async def node_get_latest_context(state: GraphState) -> GraphState:
+async def update_old_context(state: GraphState) -> GraphState:
     """
     5. 최신 컨텍스트를 가져오는 노드.
     """
     try:
         print("-------------------------")
-        print(node_get_latest_context.__name__)
+        print(update_old_context.__name__)
         print(state)
         latest_context = state["context"]
         old_context = state["old_context"]
@@ -186,17 +186,17 @@ async def node_get_latest_context(state: GraphState) -> GraphState:
     except Exception as e:
         raise CustomException(
             exception_case=ExceptionCase.GRAPH_NODE_ERROR,
-            detail=f"Error occured in node_get_latest_context: {e}",
+            detail=f"Error occured in update_old_context: {e}",
         )
 
 
-async def node_llm_invoke(state: GraphState) -> GraphState:
+async def generate_answer(state: GraphState) -> GraphState:
     """
     6. 최종 llm 답변 노드.
     """
     try:
         print("-------------------------")
-        print(node_llm_invoke.__name__)
+        print(generate_answer.__name__)
         print(state)
         question = state["question"]
         context = state["context"]
@@ -209,5 +209,5 @@ async def node_llm_invoke(state: GraphState) -> GraphState:
     except Exception as e:
         raise CustomException(
             exception_case=ExceptionCase.GRAPH_NODE_ERROR,
-            detail=f"Error occured in node_llm_invoke: {e}",
+            detail=f"Error occured in generate_answer: {e}",
         )
