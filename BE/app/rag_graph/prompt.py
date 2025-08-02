@@ -2,13 +2,13 @@
 llm 프롬프트 생성 함수 모음
 """
 
-from typing import Sequence, Optional
+from typing import Sequence, Optional, List
 from schemas.schemas import Document
 from utils.datasource_url import context_url
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 
 
-def refine_question(messages: Sequence[BaseMessage]) -> Sequence[BaseMessage]:
+def refine_question(messages: Sequence[BaseMessage]) -> List[BaseMessage]:
     """
     1. 이전 대화 내역을 바탕으로 쿼리를 재작성 해주는 노드에 사용되는 프롬프트.
     """
@@ -23,7 +23,7 @@ If the last question is already complete, please rewrite it as is. Do not add an
     ]
 
 
-def check_context_need(question: HumanMessage) -> Sequence[BaseMessage]:
+def check_context_need(question: HumanMessage) -> List[BaseMessage]:
     """
     2. 쿼리를 보고 컨텍스트 검색이 필요한지 결정하는 노드에 사용되는 프롬프트.
     """
@@ -37,7 +37,7 @@ For questions about this information, check the context. For simple answers that
     ]
 
 
-def check_context_latest(context: Sequence[Document]) -> Sequence[BaseMessage]:
+def check_context_latest(context: Sequence[Document]) -> List[BaseMessage]:
     """
     4. 컨텍스트의 최신성을 검증하는 노드에 사용되는 프롬프트. (MCP 호출)
     """
@@ -73,7 +73,7 @@ def llm_answer(
     question: str,
     messages: Sequence[BaseMessage],
     context: Optional[Sequence[Document]],
-) -> Sequence[BaseMessage]:
+) -> List[BaseMessage]:
     """
     6. 최종 llm 답변 노드에 사용되는 프롬프트.
     """
