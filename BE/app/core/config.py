@@ -1,8 +1,9 @@
 """RAG 서버 설정 파일"""
 
+import base64
+import json
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Literal, Optional
-
 
 
 class Settings(BaseSettings):
@@ -10,6 +11,7 @@ class Settings(BaseSettings):
 
     GEMINI_API_KEY: str
     NOTION_API_KEY: str
+    SMITHERY_API_KEY: str
 
     QDRANT_SERVER: Optional[str] = "http://localhost:6333"
     QDRANT_COLLECTION_NAME: Optional[str] = "test_collection"
@@ -23,5 +25,30 @@ class Settings(BaseSettings):
 
 try:
     settings = Settings()
+except Exception as e:
+    raise RuntimeError("Fail to load environment vars") from e
+
+
+class MCPConfig:
+    """MCP 설정"""
+
+    smithery_api_key = settings.SMITHERY_API_KEY
+    notion_api_key = settings.NOTION_API_KEY
+
+    @classmethod
+    def get_mcp_config(cls, key: Literal["notion"]):
+        if key == "notion":
+            config = {"notionApiKey": cls.notion_api_key}
+            config_b64 = base64.b64encode(json.dumps(config).encode()).decode()
+            return {
+                "notion": {
+                    "url": f"https://server.smithery.ai/@smithery/notion/mcp?config={config_b64}&api_key={cls.smithery_api_key}",
+                    "transport": "streamable_http",
+                }
+            }
+
+
+try:
+    mcp_config = MCPConfig()
 except Exception as e:
     raise RuntimeError("Fail to load environment vars") from e

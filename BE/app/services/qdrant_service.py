@@ -4,7 +4,7 @@ from qdrant_client.models import Distance, PointStruct
 from qdrant_client import models
 from core.config import settings
 from core.exception import CustomException, ExceptionCase
-from schemas.qdrant_schemas import DocumentInput, DocumentOutput
+from schemas.schemas import DocumentInput, DocumentOutput, DocumentMetadata
 
 
 class QdrantService:
@@ -50,7 +50,7 @@ class QdrantService:
                 PointStruct(
                     id=document.id,
                     vector=document.embedding,
-                    payload=document.metadata,
+                    payload=document.metadata.model_dump(),
                 )
                 for document in documents
             ]
@@ -65,21 +65,38 @@ class QdrantService:
             )
 
     async def query_document(
-        self, embedding: List[float], metadata: dict
+        self, embedding: List[float], metadata: DocumentMetadata
     ) -> List[DocumentOutput]:
         """임베딩 벡터로 문서 검색"""
         try:
-            query_result = await self.client.query_points(
-                collection_name=self.collection_name,
-                query=embedding,
-                query_filter=models.Filter(
-                    must=[
+            metadata_dict = metadata.model_dump()
+            must_filters = []
+            should_filters = []
+            for key, value in metadata_dict.items():
+                if key == "authority_group" and value:
+                    for group in value:
+                        should_filters.append(
+                            models.FieldCondition(
+                                key=f"{key}[]", match=models.MatchValue(value=group)
+                            )
+                        )
+                if key == "page_id" and value:
+                    must_filters.append(
                         models.FieldCondition(
                             key=key, match=models.MatchValue(value=value)
                         )
-                        for key, value in metadata.items()
-                    ]
-                ),
+                    )
+                if key == "datasource" and value:
+                    must_filters.append(
+                        models.FieldCondition(
+                            key=key, match=models.MatchValue(value=value)
+                        )
+                    )
+
+            query_result = await self.client.query_points(
+                collection_name=self.collection_name,
+                query=embedding,
+                query_filter=models.Filter(must=must_filters, should=should_filters),
             )
             query_points = query_result.points
             if not query_points:
@@ -97,7 +114,7 @@ class QdrantService:
             )
 
     async def delete_document(self, conditions: Union[List[str], dict]) -> None:
-        """Point ID로문서 삭제"""
+        """Point ID로 문서 삭제"""
         try:
             if isinstance(conditions, list):
                 await self.client.delete(
