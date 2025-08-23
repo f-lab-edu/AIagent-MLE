@@ -94,7 +94,7 @@ async def retrieve_context(state: GraphState) -> GraphState:
         )
         output_documents = await qdrant.query_document(
             embedding=embedding,
-            metadata=DocumentMetadata(authority_group=authority_group),
+            metadata=DocumentMetadata(authority_group=[authority_group]),
         )
         documents = [
             Document(
@@ -127,6 +127,9 @@ async def check_context_latest(state: GraphState) -> GraphState:
         old_context = []
 
         context = state["context"]
+        if not context:
+            return GraphState(context=latest_context, old_context=old_context)
+
         input_prompt = prompt.check_context_latest(context)
         async with agent.create_agent(
             response_format=output_structure.CheckContextLatestList
