@@ -14,7 +14,7 @@ from schemas.schemas import Document
 class GraphState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], add_messages]
     username: Annotated[str, "user"]
-    authority_group: Annotated[str, "authority_group"]
+    user_group: Annotated[str, "user_group"]
     question: Annotated[str, "question"]
     is_context_need: Annotated[bool, "is_context_need"]
     context: Annotated[Sequence[Document], "context"]

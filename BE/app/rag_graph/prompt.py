@@ -15,7 +15,7 @@ def refine_question(messages: Sequence[BaseMessage]) -> List[BaseMessage]:
 
     system = """You are an AI assistant who refines the user's question.
 Reflecting on the given "previous conversation", please reconstruct the last "user question" into a complete question that can be understood independently.
-If the last question is already complete, please rewrite it as is. Do not add any other explanation."""
+If the last question is already complete, please rewrite it as is. Do not add any other explanation."""  # noqa: E501
 
     return [
         SystemMessage(content=system),
@@ -30,7 +30,7 @@ def check_context_need(question: HumanMessage) -> List[BaseMessage]:
 
     system = """Look at the user question and decide if it needs context in the Vector Store or if it is a simple answer that can be answered right away.
 The Vector Store contains various projects and internal information from our company.
-For questions about this information, check the context. For simple answers that do not, context is not needed."""
+For questions about this information, check the context. For simple answers that do not, context is not needed."""  # noqa: E501
     return [
         SystemMessage(content=system),
         question,
@@ -53,7 +53,7 @@ def check_context_latest(context: Sequence[Document]) -> List[BaseMessage]:
 
         doc_metadata_dict[data_source].append(page_id)
 
-    prompt = """Retrieve page metadata and properties from a specified data source using each page's ID. Use the appropriate tool.\n\n"""
+    prompt = """Retrieve page metadata and properties from a specified data source using each page's ID. Use the appropriate tool.\n\n"""  # noqa: E501
     for i, (data_source, page_id_list) in enumerate(doc_metadata_dict.items()):
         prompt += f"""**{i + 1}. Data Source: {data_source}**\n- page id: {", ".join(page_id_list)}\n\n"""
 
@@ -86,7 +86,7 @@ Your job is to generate answers that are accurate, friendly, and helpful, making
 - If there is a context provided, answer based on that context.
 - If there is no context provided, answer the question directly.
 - Please write your answers in clear and understandable sentences.
-- If there is a document that is the basis for your answer, be sure to cite the source at the end of your answer in the format "[Source: {document url}]". If you referenced multiple documents, please cite them all."""
+- If there is a document that is the basis for your answer, be sure to cite the source at the end of your answer in the format "[Source: {document url}]". If you referenced multiple documents, please cite them all."""  # noqa: E501
 
     human_prompt_parts = []
 

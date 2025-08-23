@@ -1,15 +1,21 @@
 import uuid
-from typing import Optional, List, Annotated
+from typing import Optional, List, Annotated, TypeVar, Generic
 from pydantic import BaseModel, Field
 
 """
 metadata
-    - authority_group: list[str] = ['*']
+    - user_groups: list[str] = ['*']
     - content: str
     - datasource: str (ex. notion)
     - updated_at: datetime
     - page_id: str
 """
+T = TypeVar("T")
+
+
+class CustomAPIResponse(BaseModel, Generic[T]):
+    detail: str | None = ""
+    data: T = "Success"
 
 
 class Document(BaseModel):
@@ -20,7 +26,7 @@ class Document(BaseModel):
 
 
 class DocumentMetadata(Document):
-    authority_group: Optional[Annotated[List[str], "authority_group"]] = None
+    user_groups: Optional[Annotated[List[str], "user_groups"]] = None
 
 
 class DocumentInput(BaseModel):

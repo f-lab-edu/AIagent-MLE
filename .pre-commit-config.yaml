@@ -30,4 +30,4 @@ repos:
         # Flake8이 import 에러를 잘못 잡는다면 아래처럼 의존성을 명시해 줄 수 있습니다.
         # additional_dependencies: ["django", "pytest", ...]
         # 또는 프로젝트 루트에 .flake8 설정 파일이 있다면 Flake8이 자동으로 인식합니다.
-        args: [--max-line-length=300]
+        args: [--max-line-length=120]

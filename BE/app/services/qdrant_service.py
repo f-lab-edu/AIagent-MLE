@@ -65,7 +65,9 @@ class QdrantService:
             )
 
     async def query_document(
-        self, embedding: List[float], metadata: DocumentMetadata
+        self,
+        embedding: List[float] | None = None,
+        metadata: DocumentMetadata | None = None,
     ) -> List[DocumentOutput]:
         """임베딩 벡터로 문서 검색"""
         try:
@@ -73,7 +75,7 @@ class QdrantService:
             must_filters = []
             should_filters = []
             for key, value in metadata_dict.items():
-                if key == "authority_group" and value:
+                if key == "user_groups" and value:
                     for group in value:
                         should_filters.append(
                             models.FieldCondition(
@@ -133,6 +135,32 @@ class QdrantService:
                         ]
                     ),
                 )
+        except Exception as e:
+            raise CustomException(
+                exception_case=ExceptionCase.VECTOR_DB_OP_ERROR, detail=str(e)
+            )
+
+    async def update_document_payload(
+        self, datasource: str, page_id: str, update_metadata: DocumentMetadata
+    ) -> None:
+        """Point ID로 문서 메타데이터 업데이트"""
+        try:
+            metadata = update_metadata.model_dump(exclude_none=True)
+
+            await self.client.set_payload(
+                coolection_name=self.collection_name,
+                payload=metadata,
+                points=models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="datasource", match=models.MatchValue(value=datasource)
+                        ),
+                        models.FieldCondition(
+                            key="page_id", match=models.MatchValue(value=page_id)
+                        ),
+                    ]
+                ),
+            )
         except Exception as e:
             raise CustomException(
                 exception_case=ExceptionCase.VECTOR_DB_OP_ERROR, detail=str(e)

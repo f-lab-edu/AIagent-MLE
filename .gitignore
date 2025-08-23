@@ -178,3 +178,6 @@ BE/app/test.ipynb
 BE/app/test.py
 # qdrant volume
 BE/qdrant_storage
+BE/mariadb_storage
+
+FE/app/.streamlit/
