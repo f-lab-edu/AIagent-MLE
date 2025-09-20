@@ -30,7 +30,7 @@ def create_token(id: str) -> Token:
     return Token(access_token=access_token, token_type="bearer")
 
 
-def validate_token(token: str = Depends(oauth2_scheme)) -> str | None:
+def validate_token(token: str = Depends(oauth2_scheme)) -> str:
     """
     제공된 JWT 토큰의 유효성을 검사하고, 디코딩된 토큰에서 사용자 ID를 추출합니다.
     FastAPI 의존성으로 사용됩니다.
@@ -43,6 +43,11 @@ def validate_token(token: str = Depends(oauth2_scheme)) -> str | None:
     """
     decode_token = jwt_handler.decode_access_token(token)
     id = decode_token.get("id")
+    if not id:
+        raise CustomException(
+            exception_case=ExceptionCase.AUTH_INVALID_TOKEN_ERROR,
+            detail="Invalid token",
+        )
     return id
 
 
@@ -65,13 +70,13 @@ async def validate_user(email: str, password: str, session: AsyncSession) -> str
     user = await get_user_by_email(session, email)
     if not user:
         raise CustomException(
-            case=ExceptionCase.AUTH_LOGIN_ERROR, detail="User not found"
+            exception_case=ExceptionCase.AUTH_LOGIN_ERROR, detail="User not found"
         )
     if hash_handler.verify_password(password, user.hashed_password):
         return user.id
     else:
         raise CustomException(
-            case=ExceptionCase.AUTH_LOGIN_ERROR, detail="Invalid password"
+            exception_case=ExceptionCase.AUTH_LOGIN_ERROR, detail="Invalid password"
         )
 
 
@@ -104,7 +109,7 @@ async def join_user(
     current_user = await get_user(session, user_id)
     if current_user.user_group.authority_level != AuthorityLevel.ADMIN:
         raise CustomException(
-            case=ExceptionCase.AUTH_PERMISSION_ERROR,
+            exception_case=ExceptionCase.AUTH_PERMISSION_ERROR,
             detail="Only admin accounts are allowed.",
         )
 

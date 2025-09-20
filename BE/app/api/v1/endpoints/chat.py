@@ -18,7 +18,6 @@ from services.chat import (
     delete_conversations,
 )
 from db.database import get_session, AsyncSession
-from core.exception import CustomException, ExceptionCase
 from schemas.schemas import CustomAPIResponse
 
 chat_router = APIRouter(prefix="/chat", tags=["Chat"])
@@ -44,8 +43,6 @@ async def chat_stream(
     Returns:
         StreamingResponse: 그래프 이벤트를 포함한 스트리밍 응답.
     """
-    if not user_id:
-        raise CustomException(exception_case=ExceptionCase.AUTH_UNAUTHORIZED_ERROR)
 
     return StreamingResponse(
         stream_graph_events(user_id, chat_data.messages, session),
@@ -70,8 +67,6 @@ async def get_conversation_list(
     Returns:
         CustomAPIResponse: 대화 목록을 포함한 응답.
     """
-    if not user_id:
-        raise CustomException(exception_case=ExceptionCase.AUTH_UNAUTHORIZED_ERROR)
 
     conversation_list = await get_conversation_by_user_id(user_id, session)
     return CustomAPIResponse(data=conversation_list)
@@ -99,8 +94,6 @@ async def get_message_list(
     Returns:
         CustomAPIResponse: 메시지 목록을 포함한 응답.
     """
-    if not user_id:
-        raise CustomException(exception_case=ExceptionCase.AUTH_UNAUTHORIZED_ERROR)
 
     message_list = await get_messages_by_id(conversation_id, session)
     return CustomAPIResponse(data=message_list)
@@ -126,8 +119,6 @@ async def save_conversation(
     Returns:
         CustomAPIResponse: 대화 저장이 성공했음을 나타내는 빈 응답.
     """
-    if not user_id:
-        raise CustomException(exception_case=ExceptionCase.AUTH_UNAUTHORIZED_ERROR)
 
     await save_conversations(
         user_id=user_id,
@@ -159,8 +150,6 @@ async def delete_conversation(
     Returns:
         CustomAPIResponse: 대화 삭제가 성공했음을 나타내는 빈 응답.
     """
-    if not user_id:
-        raise CustomException(exception_case=ExceptionCase.AUTH_UNAUTHORIZED_ERROR)
 
     await delete_conversations(
         conversation_id=conversation_data.conversation_id, session=session

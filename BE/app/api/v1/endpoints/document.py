@@ -11,7 +11,6 @@ from api.v1.schemas.document import (
 from services.auth import validate_token
 from db.models import DataSource
 from db.database import get_session, AsyncSession
-from core.exception import CustomException, ExceptionCase
 from services.document import (
     get_documents,
     upload_documents,
@@ -55,8 +54,6 @@ async def get_document_list(
     Returns:
         CustomAPIResponse: 문서 목록을 포함한 응답.
     """
-    if not user_id:
-        raise CustomException(exception_case=ExceptionCase.AUTH_UNAUTHORIZED_ERROR)
 
     document_list = await get_documents(session=session, datasource=datasource)
 
@@ -83,8 +80,6 @@ async def upload_document(
     Returns:
         CustomAPIResponse: 업로드 성공을 나타내는 빈 응답.
     """
-    if not user_id:
-        raise CustomException(exception_case=ExceptionCase.AUTH_UNAUTHORIZED_ERROR)
 
     await upload_documents(
         datasource=documents_data.datasource,
@@ -116,8 +111,6 @@ async def delete_document(
     Returns:
         CustomAPIResponse: 삭제 성공을 나타내는 빈 응답.
     """
-    if not user_id:
-        raise CustomException(exception_case=ExceptionCase.AUTH_UNAUTHORIZED_ERROR)
 
     await delete_documents(
         datasource=documents_data.datasource,
@@ -148,8 +141,6 @@ async def update_document(
     Returns:
         CustomAPIResponse: 수정 성공을 나타내는 빈 응답.
     """
-    if not user_id:
-        raise CustomException(exception_case=ExceptionCase.AUTH_UNAUTHORIZED_ERROR)
 
     await update_document_user_groups(
         datasource=documents_data.datasource,

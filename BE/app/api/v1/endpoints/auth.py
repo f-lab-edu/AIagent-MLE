@@ -6,7 +6,6 @@ from fastapi import APIRouter, Depends
 from api.v1.schemas.auth import LoginRequest, JoinRequest
 from services.auth import create_token, validate_user, join_user, validate_token
 from db.database import get_session, AsyncSession
-from core.exception import CustomException, ExceptionCase
 from schemas.schemas import CustomAPIResponse
 
 auth_router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -50,8 +49,6 @@ async def join(
     Returns:
         CustomAPIResponse: 회원가입 성공을 나타내는 빈 응답.
     """
-    if not user_id:
-        raise CustomException(exception_case=ExceptionCase.AUTH_UNAUTHORIZED_ERROR)
 
     await join_user(
         user_id=user_id,

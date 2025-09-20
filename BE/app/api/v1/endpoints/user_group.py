@@ -11,7 +11,6 @@ from services.auth import validate_token
 from services.user_group import get_user_groups, add_user_group, delete_user_group_by_id
 from db.database import get_session, AsyncSession
 from db.models import AuthorityLevel
-from core.exception import CustomException, ExceptionCase
 from schemas.schemas import CustomAPIResponse
 
 
@@ -36,8 +35,6 @@ async def get_user_groups_list(
     Returns:
         CustomAPIResponse: 사용자 그룹 목록을 포함한 응답.
     """
-    if not user_id:
-        raise CustomException(exception_case=ExceptionCase.AUTH_UNAUTHORIZED_ERROR)
 
     user_groups = await get_user_groups(session=session)
     return CustomAPIResponse(data=user_groups)
@@ -57,8 +54,6 @@ async def get_authority_level_list(user_id: str = Depends(validate_token)):
     Returns:
         CustomAPIResponse: 권한 등급 목록을 포함한 응답.
     """
-    if not user_id:
-        raise CustomException(exception_case=ExceptionCase.AUTH_UNAUTHORIZED_ERROR)
 
     return CustomAPIResponse(data=list(AuthorityLevel._value2member_map_.keys()))
 
@@ -83,8 +78,6 @@ async def create_user_group(
     Returns:
         CustomAPIResponse: 생성 성공을 나타내는 빈 응답.
     """
-    if not user_id:
-        raise CustomException(exception_case=ExceptionCase.AUTH_UNAUTHORIZED_ERROR)
 
     await add_user_group(
         name=user_group_data.name,
@@ -115,8 +108,6 @@ async def delete_user_group(
     Returns:
         CustomAPIResponse: 삭제 성공을 나타내는 빈 응답.
     """
-    if not user_id:
-        raise CustomException(exception_case=ExceptionCase.AUTH_UNAUTHORIZED_ERROR)
 
     await delete_user_group_by_id(id=user_group_data.id, session=session)
 
