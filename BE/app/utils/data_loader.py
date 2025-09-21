@@ -2,7 +2,7 @@
 데이터소스(ex. notion)에서 문서를 가져오는 모듈
 """
 
-from typing import List, Dict, Any, Literal, Union
+from typing import List, Dict, Any, Union
 from notion_client import AsyncClient
 from notion_client.errors import APIResponseError
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -12,10 +12,11 @@ from core.exception import CustomException, ExceptionCase
 from schemas.schemas import Document, DocumentInput, DocumentMetadata
 from services.qdrant_service import QdrantService
 from services.gemini import GeminiService
+from db.models import DataSource
 
 
 class NotionDataLoader:
-    DATASOURCE = "notion"
+    DATASOURCE = DataSource.NOTION.value
 
     def __init__(self):
         self.notion = AsyncClient(auth=settings.NOTION_API_KEY)
@@ -255,7 +256,7 @@ class NotionDataLoader:
     async def upload_documents(
         self,
         page_id: str,
-        authority_group: List[str],
+        user_groups: List[str],
         recursive_page: bool = True,
     ) -> None:
         try:
@@ -269,7 +270,7 @@ class NotionDataLoader:
                         contents=document.content, task="RETRIEVAL_DOCUMENT"
                     ),
                     metadata=DocumentMetadata(
-                        authority_group=authority_group,
+                        user_groups=user_groups,
                         **document.model_dump(),
                     ),
                 )
@@ -283,8 +284,8 @@ class NotionDataLoader:
             )
 
 
-def get_data_loader(datasource: Literal["notion"]) -> Union[NotionDataLoader, None]:
-    if datasource == "notion":
+def get_data_loader(datasource: DataSource) -> Union[NotionDataLoader, None]:
+    if datasource == DataSource.NOTION:
         return NotionDataLoader()
     else:
         return None
