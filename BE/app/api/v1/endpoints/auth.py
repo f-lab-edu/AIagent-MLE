@@ -26,7 +26,8 @@ async def login(login_data: LoginRequest, session: AsyncSession = Depends(get_se
     user_id = await validate_user(
         email=login_data.email, password=login_data.password, session=session
     )
-    return CustomAPIResponse(data=create_token(user_id))
+    token = await create_token(user_id, session)
+    return CustomAPIResponse(data=token)
 
 
 @auth_router.post("/join", response_model=CustomAPIResponse)
