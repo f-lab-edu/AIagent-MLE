@@ -11,7 +11,7 @@ from core.config import settings
 from core.exception import CustomException, ExceptionCase
 
 
-def create_access_token(id: str) -> dict:
+def create_access_token(id: str, authority_level: str) -> dict:
     """
     사용자 ID를 받아 JWT 액세스 토큰을 생성합니다.
     토큰에는 만료 시간과 사용자 ID가 포함됩니다.
@@ -27,6 +27,7 @@ def create_access_token(id: str) -> dict:
             "exp": datetime.datetime.now(tz=pytz.timezone("Asia/Seoul"))
             + datetime.timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
             "id": id,
+            "authority_level": authority_level,
         }
         encoded = jwt.encode(
             payload=payload, key=settings.SECRET_KEY, algorithm=settings.ALGORITHM
