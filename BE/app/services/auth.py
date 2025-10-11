@@ -10,13 +10,13 @@ from utils import jwt_handler, hash_handler
 from api.v1.schemas.auth import Token
 from db.database import AsyncSession
 from db.models import User, AuthorityLevel
-from crud.user import get_user_by_email, create_user, get_user
+from crud.user import get_user_by_email, create_user, get_user_authority_level
 
 # OAuth2PasswordBearer: 'auth/login' 엔드포인트에서 토큰을 가져오는 보안 스키마
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
-def create_token(id: str) -> Token:
+async def create_token(id: str, session: AsyncSession) -> Token:
     """
     사용자 ID를 기반으로 JWT 액세스 토큰을 생성합니다.
 
@@ -26,7 +26,8 @@ def create_token(id: str) -> Token:
     Returns:
         Token: 생성된 액세스 토큰과 토큰 타입을 포함하는 객체.
     """
-    access_token = jwt_handler.create_access_token(id)
+    authority_level = await get_user_authority_level(session, id)
+    access_token = jwt_handler.create_access_token(id, authority_level.value)
     return Token(access_token=access_token, token_type="bearer")
 
 
@@ -106,11 +107,17 @@ async def join_user(
     Returns:
         User: 생성된 사용자 객체.
     """
-    current_user = await get_user(session, user_id)
-    if current_user.user_group.authority_level != AuthorityLevel.ADMIN:
+    authority_level = await get_user_authority_level(session, user_id)
+    if authority_level != AuthorityLevel.ADMIN:
         raise CustomException(
             exception_case=ExceptionCase.AUTH_PERMISSION_ERROR,
             detail="Only admin accounts are allowed.",
+        )
+
+    exist_user = await get_user_by_email(session, email)
+    if exist_user:
+        raise CustomException(
+            exception_case=ExceptionCase.AUTH_JOIN_ERROR, detail="User already exists."
         )
 
     user = User(

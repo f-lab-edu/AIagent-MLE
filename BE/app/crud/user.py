@@ -2,9 +2,10 @@
 User 모델에 대한 데이터베이스 CRUD(Create, Read, Update, Delete) 작업을 정의합니다.
 """
 
+from sqlalchemy.orm import selectinload
 from sqlmodel import select
 from core.exception import CustomException, ExceptionCase
-from db.models import User
+from db.models import User, AuthorityLevel
 from db.database import AsyncSession
 
 
@@ -24,6 +25,29 @@ async def get_user(session: AsyncSession, id: str) -> User | None:
         result = await session.exec(statement)
         user = result.first()
         return user
+    except Exception as e:
+        raise CustomException(exception_case=ExceptionCase.DB_OP_ERROR, detail=str(e))
+
+
+async def get_user_authority_level(session: AsyncSession, id: str) -> AuthorityLevel:
+    """
+    ID를 기준으로 사용자의 권한 수준을 조회합니다.
+
+    Args:
+        session (AsyncSession): 데이터베이스 세션.
+        id (str): 조회할 사용자의 ID.
+
+    Returns:
+        AuthorityLevel: 조회된 사용자의 권한 수준.
+    """
+    try:
+        statement = (
+            select(User).where(User.id == id).options(selectinload(User.user_group))
+        )
+        result = await session.exec(statement)
+        user = result.first()
+        user_group = user.user_group
+        return user_group.authority_level
     except Exception as e:
         raise CustomException(exception_case=ExceptionCase.DB_OP_ERROR, detail=str(e))
 
